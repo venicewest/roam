@@ -1,7 +1,7 @@
 // components/tour/NarrationStrip.tsx
 // Fixed bottom strip showing current POI + narration controls.
 // Replaces the slide-up NarrationCard overlay.
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   PanResponder,
   StyleSheet,
@@ -34,12 +34,17 @@ export function NarrationStrip({
   onPause,
   onSkip,
 }: Props) {
+  const isInGapRef = useRef(isInGap);
+  const onSkipRef = useRef(onSkip);
+  useEffect(() => { isInGapRef.current = isInGap; }, [isInGap]);
+  useEffect(() => { onSkipRef.current = onSkip; }, [onSkip]);
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gs) =>
         Math.abs(gs.dx) > 40 && Math.abs(gs.dy) < 20,
       onPanResponderRelease: (_, gs) => {
-        if (gs.dx < -40 && !isInGap) onSkip();
+        if (gs.dx < -40 && !isInGapRef.current) onSkipRef.current();
       },
     }),
   ).current;
