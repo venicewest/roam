@@ -17,3 +17,8 @@ export const Animated = {
 };
 export const Dimensions = { get: () => ({ width: 375, height: 812 }) };
 export const AccessibilityInfo = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
+export const PanResponder = {
+  create: (config: Record<string, unknown>) => ({
+    panHandlers: {},
+  }),
+};
