@@ -45,3 +45,14 @@ export function formatRelativeTime(isoString: string): string {
 export function formatStops(n: number): string {
   return `${n} ${n === 1 ? "stop" : "stops"}`;
 }
+
+/**
+ * Formats a Supabase ISO timestamp for transaction rows.
+ * Output: "Mar 19 · 2:41 PM"
+ */
+export function formatTransactionDate(iso: string): string {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return `${date} · ${time}`;
+}
