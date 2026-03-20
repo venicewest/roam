@@ -220,6 +220,10 @@ export function usePoiScanner({ onPoiReady }: ScannerOptions) {
       clearInterval(scanTimer.current);
       scanTimer.current = null;
     }
+    if (stationaryTimer.current) {
+      clearTimeout(stationaryTimer.current);
+      stationaryTimer.current = null;
+    }
   }, []);
 
   // Restart the scan interval after suspendScanner(). Does NOT re-fetch tiles.
