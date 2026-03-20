@@ -107,6 +107,15 @@ function RootLayoutNav() {
             presentation: "modal",
           }}
         />
+        <Stack.Screen
+          name="billing-history"
+          options={{
+            headerShown: true,
+            title: "Billing history",
+            headerStyle: { backgroundColor: "#1a1a2e" },
+            headerTintColor: "#ffffff",
+          }}
+        />
       </Stack>
     </>
   );
