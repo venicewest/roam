@@ -89,7 +89,8 @@ export function TourMap({ location, pois, currentPoiId, poiStates, queue, onPoiP
         }
 
         // QUEUED — fading label pins
-        const queueIndex = queueIndexMap[poi.id] ?? 2;
+        const queueIndex = queueIndexMap[poi.id];
+        if (queueIndex === undefined) return null; // queue and poiStates out of sync — skip
         const opacity = queueIndex === 0 ? 1 : queueIndex === 1 ? 0.5 : 0.2;
         const isNext = queueIndex === 0;
         const dist = location
