@@ -105,3 +105,27 @@ export const fireEvent = {
     // If onPress is undefined, the button is effectively disabled — do nothing.
   },
 };
+
+export async function waitFor(
+  callback: () => void | Promise<void>,
+  options?: { timeout?: number },
+): Promise<void> {
+  const timeout = options?.timeout ?? 1000;
+  const startTime = Date.now();
+  let lastError: any;
+
+  while (Date.now() - startTime < timeout) {
+    try {
+      const result = callback();
+      if (result instanceof Promise) {
+        await result;
+      }
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  }
+
+  throw lastError || new Error('waitFor timeout');
+}
