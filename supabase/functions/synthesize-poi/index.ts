@@ -140,23 +140,30 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
-    const userToken =
-      req.headers.get("x-user-token") ??
-      req.headers.get("Authorization")?.replace("Bearer ", "") ??
-      "";
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: { Authorization: `Bearer ${userToken}` },
-      },
-    });
+    // M2M bypass: allow service-role calls (from submit-poi and pg_cron)
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const isMachineCall = authHeader === `Bearer ${serviceRoleKey}`;
 
-    const { data: { user }, error: authError } = await userClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ success: false, error: { code: "unauthorized", message: "Invalid token" } }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+    if (!isMachineCall) {
+      const userToken =
+        req.headers.get("x-user-token") ??
+        req.headers.get("Authorization")?.replace("Bearer ", "") ??
+        "";
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: {
+          headers: { Authorization: `Bearer ${userToken}` },
+        },
+      });
+
+      const { data: { user }, error: authError } = await userClient.auth.getUser();
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ success: false, error: { code: "unauthorized", message: "Invalid token" } }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
     }
 
     const { poi_id, depth_tier = 'full' } = await req.json();
@@ -269,14 +276,18 @@ Deno.serve(async (req) => {
         duration_seconds: null,
       });
 
-    // Update the POI with the generated narrative and promote to Tier 2
+    // Update the POI with the generated narrative and promote to Tier 2 (if not user-submitted)
     await adminClient
       .from("pois")
       .update({
         narrative,
-        tier: 2,
-        confidence_score: 0.6,
-        source_attribution: `AI-generated (${provider})`,
+        // Do not promote user-submitted tier=3 POIs to tier=2
+        ...(poi.tier < 3 ? { tier: 2 } : {}),
+        ai_generated_at: new Date().toISOString(),
+        confidence_score: 0.7,
+        source_attribution: "ai_generated",
+        // Activate POIs that were held under_review pending synthesis
+        ...(poi.quality_status === "under_review" ? { quality_status: "active" } : {}),
       })
       .eq("id", poi_id);
 
