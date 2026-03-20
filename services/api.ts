@@ -68,6 +68,7 @@ export const api = {
     interest_category_ids: number[];
     city: string;
     is_group_tour: boolean;
+    depth_tier?: 'quick' | 'full' | 'expert';
   }) =>
     call<{ session_id: string; join_code: string | null }>(
       "start-tour-session",
