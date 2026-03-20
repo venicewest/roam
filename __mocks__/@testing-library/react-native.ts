@@ -78,6 +78,32 @@ function findByText(instance: ReturnType<typeof create>, text: string | RegExp):
   throw new Error(`Unable to find element with text: ${text}`);
 }
 
+function findByPlaceholder(instance: ReturnType<typeof create>, placeholder: string): any {
+  const root = instance.toJSON();
+  if (!root) throw new Error(`Unable to find element with placeholder: ${placeholder}`);
+
+  function search(node: any): any {
+    if (!node || typeof node !== 'object') return null;
+    if (node.props?.placeholder === placeholder) return node;
+    if (Array.isArray(node.children)) {
+      for (const child of node.children) {
+        if (typeof child === 'object') {
+          const found = search(child);
+          if (found) return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  const nodes = Array.isArray(root) ? root : [root];
+  for (const node of nodes) {
+    const found = search(node);
+    if (found) return found;
+  }
+  throw new Error(`Unable to find element with placeholder: ${placeholder}`);
+}
+
 export function render(element: React.ReactElement) {
   let instance: ReturnType<typeof create>;
   reactAct(() => {
@@ -88,11 +114,15 @@ export function render(element: React.ReactElement) {
     return findByText(instance!, text);
   }
 
+  function getByPlaceholderText(placeholder: string) {
+    return findByPlaceholder(instance!, placeholder);
+  }
+
   function toJSON() {
     return instance!.toJSON();
   }
 
-  return { getByText, toJSON };
+  return { getByText, getByPlaceholderText, toJSON };
 }
 
 export const fireEvent = {
@@ -100,9 +130,20 @@ export const fireEvent = {
     if (!element) throw new Error('fireEvent.press: element is null');
     const props = element.props ?? {};
     if (typeof props.onPress === 'function') {
-      props.onPress();
+      reactAct(() => {
+        props.onPress();
+      });
     }
     // If onPress is undefined, the button is effectively disabled — do nothing.
+  },
+  changeText(element: any, value: string) {
+    if (!element) throw new Error('fireEvent.changeText: element is null');
+    const props = element.props ?? {};
+    if (typeof props.onChangeText === 'function') {
+      reactAct(() => {
+        props.onChangeText(value);
+      });
+    }
   },
 };
 
@@ -115,6 +156,8 @@ export async function waitFor(
   let lastError: any;
 
   while (Date.now() - startTime < timeout) {
+    // Flush microtasks/promises before each attempt
+    await new Promise(resolve => setTimeout(resolve, 10));
     try {
       const result = callback();
       if (result instanceof Promise) {
