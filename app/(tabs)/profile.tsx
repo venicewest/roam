@@ -84,6 +84,14 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={() => router.push('/billing-history' as any)}
+        >
+          <Text style={styles.menuItemText}>🧾 Billing history</Text>
+          <Text style={styles.menuArrow}>→</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
           onPress={() => router.push("/voice-selector" as any)}
         >
           <Text style={styles.menuItemText}>🎙 Narration Voice</Text>

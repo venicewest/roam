@@ -96,6 +96,13 @@ export default function StoreScreen() {
         ))
       )}
 
+      <TouchableOpacity
+        onPress={() => router.push('/billing-history' as any)}
+        style={{ paddingVertical: 16, alignItems: 'center' }}
+      >
+        <Text style={{ color: '#f0a500', fontSize: 13 }}>View billing history →</Text>
+      </TouchableOpacity>
+
       <Text style={styles.note}>
         Payments processed securely via Stripe.{"\n"}
         Credits never expire.
