@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
 
     const { data: transactions } = await adminClient
       .from("credit_transactions")
-      .select("*")
+      .select("*, tour_sessions(city)")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50);

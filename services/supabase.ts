@@ -130,4 +130,5 @@ export type CreditTransaction = {
   tour_session_id: string | null;
   stripe_payment_intent_id: string | null;
   created_at: string;
+  tour_sessions: { city: string } | null;  // joined — only present for tour_charge rows
 };
