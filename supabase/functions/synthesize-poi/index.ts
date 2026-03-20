@@ -167,7 +167,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const depthTier: DepthTier = ['quick', 'full', 'expert'].includes(depth_tier)
+    const VALID_TIERS = ['quick', 'full', 'expert'] as const;
+    const depthTier: DepthTier = (VALID_TIERS as readonly string[]).includes(depth_tier)
       ? (depth_tier as DepthTier)
       : 'full';
 
