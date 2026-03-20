@@ -16,6 +16,7 @@ import { NarrationStrip } from "../../components/tour/NarrationStrip";
 import { PoiDrawer } from "../../components/tour/PoiDrawer";
 import { TourMap } from "../../components/tour/TourMap";
 import { BottomSheet } from "../../components/shared/BottomSheet";
+import { SubmitPoiSheet } from "../../components/shared/SubmitPoiSheet";
 import { useAudioPlayer } from "../../hooks/useAudioPlayer";
 import { useGroupTour } from "../../hooks/useGroupTour";
 import { useLocation } from "../../hooks/useLocation";
@@ -32,6 +33,7 @@ import { usePoiStore } from "../../stores/poiStore";
 export default function TourScreen() {
   const { session_id } = useLocalSearchParams<{ session_id: string }>();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
   const [liveGuestCount, setLiveGuestCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [followupRequestedIds, setFollowupRequestedIds] = useState<Set<string>>(new Set());
@@ -310,6 +312,14 @@ export default function TourScreen() {
               : "≡"}
           </Text>
         </TouchableOpacity>
+
+        {/* Suggest POI — top right, below transcript toggle */}
+        <TouchableOpacity
+          onPress={() => setShowSuggest(true)}
+          style={styles.overlayButton}
+        >
+          <Text style={styles.overlayButtonText}>+ Suggest</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Header bar — slim, absolute positioned over map */}
@@ -346,6 +356,12 @@ export default function TourScreen() {
         <Text style={styles.drawerTitle}>Tour transcript</Text>
         <PoiDrawer events={pendingNarrationEvents} />
       </BottomSheet>
+
+      <SubmitPoiSheet
+        visible={showSuggest}
+        onClose={() => setShowSuggest(false)}
+        initialCoords={location ? { lat: location.lat, lng: location.lon } : undefined}
+      />
     </View>
   );
 }
@@ -401,4 +417,16 @@ const styles = StyleSheet.create({
   },
   transcriptToggleText: { color: '#aaa', fontSize: 16 },
   drawerTitle: { color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  overlayButton: {
+    position: 'absolute',
+    top: 90,
+    right: 12,
+    backgroundColor: '#00000088',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: '#f0a500',
+  },
+  overlayButtonText: { color: '#f0a500', fontSize: 12, fontWeight: '600' },
 });

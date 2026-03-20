@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { api } from "../../services/api";
+import { SubmitPoiSheet } from '../../components/shared/SubmitPoiSheet';
 
 const COVERAGE_LABELS: Record<string, string> = {
   excellent: "Excellent coverage",
@@ -40,6 +41,7 @@ export default function HomeScreen() {
     fetchProfile,
   } = useUserStore();
 
+  const [showSuggest, setShowSuggest] = useState(false);
   const [locationGranted, setLocationGranted] = useState(false);
   const [checkingLocation, setCheckingLocation] = useState(true);
   const [startingTour, setStartingTour] = useState(false);
@@ -285,6 +287,13 @@ export default function HomeScreen() {
             Share a code · guests join free
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setShowSuggest(true)}
+          style={styles.suggestButton}
+        >
+          <Text style={styles.suggestText}>+ Suggest</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Low balance nudge */}
@@ -300,6 +309,8 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       )}
+
+      <SubmitPoiSheet visible={showSuggest} onClose={() => setShowSuggest(false)} />
     </ScrollView>
   );
 }
@@ -441,4 +452,6 @@ const styles = StyleSheet.create({
   tierBtnActive: { backgroundColor: '#1a2a1a', borderColor: '#4a7c4a' },
   tierBtnText: { color: '#666', fontSize: 13, fontWeight: '600' },
   tierBtnTextActive: { color: '#7ac47a' },
+  suggestButton: { borderWidth: 1, borderColor: '#f0a500', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, marginTop: 10, alignItems: 'center' },
+  suggestText: { color: '#f0a500', fontSize: 13, fontWeight: '600' },
 });
