@@ -172,4 +172,12 @@ export const api = {
       "get-poi-followup",
       body,
     ),
+
+  submitPoi: (name: string, categoryId: number, lat: number, lng: number) =>
+    call<{ poi_id: string }>("submit-poi", {
+      name,
+      category_id: categoryId,
+      lat,
+      lng,
+    }),
 };
