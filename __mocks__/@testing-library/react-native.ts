@@ -88,7 +88,11 @@ export function render(element: React.ReactElement) {
     return findByText(instance!, text);
   }
 
-  return { getByText };
+  function toJSON() {
+    return instance!.toJSON();
+  }
+
+  return { getByText, toJSON };
 }
 
 export const fireEvent = {
