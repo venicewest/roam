@@ -1,6 +1,6 @@
 // supabase/functions/get-poi-followup/index.ts
 // Generates a deeper follow-up narration for a POI the user wants to
-// explore further. Caches audio at poi-audio/{poi_id}/followup-{tier}.mp3.
+// explore further. Caches audio at pois/{poi_id}/followup-{tier}.mp3 in the poi-audio bucket.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -146,7 +146,19 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { poi_id, depth_tier = "full" } = await req.json();
+    let poi_id: string | undefined;
+    let depth_tier = "full";
+    try {
+      const body = await req.json();
+      poi_id = body.poi_id;
+      depth_tier = body.depth_tier ?? "full";
+    } catch {
+      clearTimeout(timeout);
+      return new Response(
+        JSON.stringify({ success: false, error: { code: "invalid_body", message: "Request body must be valid JSON" } }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
     if (!poi_id) {
       clearTimeout(timeout);
       return new Response(
@@ -229,9 +241,17 @@ Deno.serve(async (req) => {
     const audioBuffer = await generateTTS(narrative, controller.signal);
     const audioBlob = new Blob([audioBuffer], { type: "audio/mpeg" });
 
-    await adminClient.storage
+    const { error: uploadError } = await adminClient.storage
       .from("poi-audio")
       .upload(audioPath, audioBlob, { contentType: "audio/mpeg", upsert: true });
+
+    if (uploadError) {
+      clearTimeout(timeout);
+      return new Response(
+        JSON.stringify({ success: false, error: { code: "storage_error", message: "Failed to cache audio" } }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     const { data: signedUrlData } = await adminClient.storage
       .from("poi-audio")
