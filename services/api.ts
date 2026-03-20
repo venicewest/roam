@@ -1,5 +1,6 @@
 // services/api.ts
 import { supabase } from "./supabase";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "../constants/config";
 
 export type ApiResponse<T> = {
   success: boolean;
@@ -14,10 +15,8 @@ export type ApiResponse<T> = {
   };
 };
 
-const FUNCTIONS_URL =
-  "https://rqgtiuomhgshewvaoeak.supabase.co/functions/v1";
-const ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxZ3RpdW9taGdzaGV3dmFvZWFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNjY2NTksImV4cCI6MjA4ODc0MjY1OX0.rTLn6sU1-P1DiWS2Wpyhw01wKTkruK41xHBdn-HvOH0";
+const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+const ANON_KEY = SUPABASE_ANON_KEY;
 
 async function call<T>(
   functionName: string,
