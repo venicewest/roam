@@ -1,39 +1,85 @@
 {
   "expo": {
-    "name": "roam2",
-    "slug": "roam2",
+    "name": "Roam",
+    "slug": "roam",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "roam2",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#1a1a2e"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.roam.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Roam uses your location to find interesting places nearby as you walk.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Roam uses your location in the background to continue narrating as you walk.",
+        "NSMicrophoneUsageDescription": "Roam does not use your microphone."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#1a1a2e"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "com.roam.app",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Roam uses your location to find interesting places nearby as you walk.",
+          "locationAlwaysPermission": "Roam uses your location in the background to continue narrating as you walk.",
+          "locationWhenInUsePermission": "Roam uses your location to find interesting places nearby as you walk.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": false
+        }
+      ],
+      "expo-task-manager",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.roam.app"
+        }
+      ],
+      "expo-apple-authentication",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "scheme": "roam",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d5c35b0b-03a9-4f3f-a242-e12bfc27e0de"
+      }
+    },
+    "owner": "avatar2534"
   }
 }
